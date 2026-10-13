@@ -1,0 +1,24 @@
+{
+  "name": "Support Agent Lab",
+  "image": "mcr.microsoft.com/devcontainers/python:3.13-bookworm",
+  "remoteUser": "vscode",
+  "forwardPorts": [8765],
+  "portsAttributes": {
+    "8765": {
+      "label": "Support Agent Lab",
+      "onAutoForward": "openBrowser",
+      "protocol": "http"
+    }
+  },
+  "postCreateCommand": "python -m pip install -r requirements.txt",
+  "postStartCommand": "bash -lc 'if ! curl --max-time 3 -fsS http://127.0.0.1:8765/api/health >/dev/null 2>&1; then nohup python app.py --host 0.0.0.0 --port 8765 >/tmp/support-agent-lab.log 2>&1 </dev/null & echo $! >/tmp/support-agent-lab.pid; fi'",
+  "waitFor": "postCreateCommand",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  }
+}

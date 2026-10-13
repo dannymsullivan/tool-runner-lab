@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f5f0">
+  <title>Tool Runner Lab · Learn by building</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body data-view="demo">
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="wordmark" href="/" aria-label="Tool Runner Lab home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M4 5h9v9H4zM15 14h9v9h-9z"/><path d="M18 5v5m-2.5-2.5h5M7 19v5m-2.5-2.5h5"/></svg></span>Tool Runner Lab<span class="brand-divider">/</span><span class="brand-light">Learn by building</span></a>
+      <div class="lab-header-actions"><button id="home-demo" class="header-text-button" type="button" hidden>Try the bot</button><button id="open-lessons" class="header-text-button" type="button">Lessons</button><div class="header-source"><a id="source-link" href="https://github.com/codespaces" target="_blank" rel="noopener noreferrer">Open Codespaces ↗</a><span id="source-note">Upload this lab to a repository to open its source.</span></div></div>
+    </header>
+
+    <main>
+      <section id="demo-view" class="demo-view" aria-labelledby="demo-heading">
+        <div class="demo-intro">
+          <p class="eyebrow">START WITH THE EXPERIENCE</p>
+          <h1 id="demo-heading">A support bot.<br><span>A real task.</span></h1>
+          <p>Check a delayed order. Find a replacement. Start a return.<br>Try it first, then discover how the tools work.</p>
+        </div>
+
+        <div class="demo-chat">
+          <div class="demo-chat-header"><div class="demo-brand"><span class="demo-acorn" aria-hidden="true">a</span><strong>Acorn support</strong></div><span id="demo-mode-label">Practice · no key</span></div>
+          <div class="demo-chat-body">
+            <p class="demo-greeting">Hi! I can check your order, look for a replacement, and help with a return.</p>
+            <form id="demo-form" class="demo-form">
+              <label for="demo-prompt">Your request</label>
+              <textarea id="demo-prompt" rows="3" readonly>Loading the customer request…</textarea>
+              <div class="demo-send-row"><button id="demo-send" class="primary-button" type="submit" disabled>Send request →</button></div>
+            </form>
+            <p id="demo-status" class="demo-status" role="status" aria-live="polite"></p>
+            <div id="demo-reply" class="demo-reply" hidden>
+              <span class="demo-reply-label">Support bot</span>
+              <p id="demo-answer"></p>
+              <p id="demo-outcome" class="demo-outcome"></p>
+              <p id="demo-verification" class="demo-verification" hidden></p>
+            </div>
+          </div>
+        </div>
+        <div class="demo-options">
+          <p id="demo-mode-note">Practice uses scripted model replies. Tool Runner, Python tools, and database writes really run.</p>
+          <div class="demo-mode-actions"><button id="demo-connect" type="button" class="text-button">Use your Claude API key</button><button id="demo-mode-switch" type="button" class="text-button" hidden>Switch to practice</button></div>
+        </div>
+        <div id="demo-next" class="demo-next" hidden><button id="demo-explain" class="primary-button" type="button">See how it worked →</button></div>
+
+        <section id="demo-breakdown" class="demo-breakdown" tabindex="-1" aria-labelledby="demo-breakdown-heading" hidden>
+          <p class="eyebrow">BEHIND THE ANSWER</p>
+          <h2 id="demo-breakdown-heading">One request.<br>A conversation with your tools.</h2>
+          <p class="demo-section-intro">The model requests tools. Tool Runner calls your Python functions, returns their results, and continues the conversation.</p>
+          <ol id="demo-tool-story" class="demo-tool-story"></ol>
+          <p id="demo-runner-summary" class="demo-runner-summary"></p><p class="demo-roles">The model chooses. Tool Runner coordinates. Your tools do the work.</p>
+          <details class="demo-code"><summary>See the small piece of code</summary><pre><code>runner = client.beta.messages.tool_runner(
+    model=model,
+    max_tokens=1024,
+    messages=[{"role": "user", "content": request}],
+    tools=[lookup_order, check_inventory, start_return],
+)
+runner.until_done()</code></pre><p>Illustrative Python: the client, model, and tools are already configured. <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner" target="_blank" rel="noopener noreferrer">Tool Runner documentation ↗</a></p></details>
+        </section>
+
+        <section id="demo-prediction" class="demo-prediction" aria-labelledby="demo-prediction-heading" hidden>
+          <p class="eyebrow">CHANGE ONE THING</p>
+          <h2 id="demo-prediction-heading">What if a replacement is in stock?</h2>
+          <p class="demo-section-intro">Same request. Change only the stock from 0 to 3.</p>
+          <form id="demo-prediction-form">
+            <fieldset><legend>What do you think the bot will do?</legend><label class="demo-choice"><input type="radio" name="demo-prediction" value="return"><span>Create a return anyway</span></label><label class="demo-choice"><input type="radio" name="demo-prediction" value="stock"><span>Report replacement availability</span></label></fieldset>
+            <button id="demo-test" class="primary-button" type="submit" disabled>Test my prediction →</button>
+          </form>
+          <p id="demo-prediction-status" class="demo-status" role="status" aria-live="polite"></p>
+          <div id="demo-comparison" class="demo-comparison" hidden>
+            <p id="demo-prediction-feedback"></p>
+            <dl class="demo-result-comparison"><div><dt>Out of stock</dt><dd id="demo-before-result"></dd></div><div><dt>3 in stock</dt><dd id="demo-after-result"></dd></div></dl>
+            <p class="demo-comparison-note">Both runs start with a fresh store. No replacement is ordered.</p><div class="demo-build-next"><button id="demo-build" class="primary-button" type="button">Explore the code →</button><p>Follow the same conversation, build a Python tool, then test its limits.</p></div>
+          </div>
+        </section>
+        <button id="demo-restart" class="text-button demo-restart" type="button" hidden>Start over</button>
+      </section>
+
+      <section id="series-view" class="notebook-view series-view" aria-labelledby="series-heading" hidden>
+        <div class="notebook-topline">
+          <button id="series-back" class="text-button" type="button">← Back to the bot</button>
+          <button id="series-intro" class="text-button" type="button">Revisit the introduction</button>
+        </div>
+        <div id="series-index">
+          <p class="notebook-progress">A SELF-PACED LAB SERIES</p>
+          <h1 id="series-heading" tabindex="-1">Build it, one lab at a time.</h1>
+          <p class="notebook-instruction">Four independent Colab notebooks. Write a little Python, see your bot use it, and check what happened. Start at the beginning or choose what you need.</p>
+          <button id="series-resume" class="text-button series-resume" type="button" hidden></button>
+          <div id="series-list" class="series-list" aria-label="Available labs"></div>
+          <p id="series-status" role="status" aria-live="polite">Loading the labs…</p>
+          <button id="series-retry" class="text-button" type="button" hidden>Try loading the labs again</button>
+          <p class="notebook-mode-note">Basic Python is enough to start. Practice needs no API key. Each notebook includes checks, hints, and a way to catch up.</p>
+        </div>
+        <article id="series-detail" aria-labelledby="series-detail-heading" hidden>
+          <button id="series-all" class="text-button" type="button">← All labs</button>
+          <p id="series-detail-kicker" class="notebook-progress"></p>
+          <h1 id="series-detail-heading" tabindex="-1"></h1>
+          <p id="series-detail-outcome" class="notebook-instruction"></p>
+          <p id="series-detail-task" class="series-task"></p>
+          <a id="series-download" class="primary-button series-download" download>Download for Colab ↓</a>
+          <p id="series-open-help" class="series-open-help">Download the notebook, then upload it in Google Colab.</p>
+          <a id="series-file" class="series-file" download hidden>Download notebook instead ↓</a>
+          <button id="series-preview" class="text-button series-preview" type="button">Try the guided preview here →</button>
+          <p class="series-preview-note">These examples use supplied code. In Colab, the bot runs the functions you edit.</p>
+          <details id="series-recovery" class="series-recovery">
+            <summary>If you get stuck</summary>
+            <p>Use the notebook’s hint first, then run its check again. An explicit recovery cell can load a reference implementation. Keep your own copy to return to your work.</p>
+            <a id="series-reference" download>Download the complete reference ↓</a>
+          </details>
+          <details class="series-recovery">
+            <summary>Keep your work and come back</summary>
+            <p>Save a copy of the notebook in your Drive. Your code stays in that copy; after a runtime disconnects, rerun setup and your edited cells. Each lab includes the pieces it needs, so you can start the next one independently.</p>
+          </details>
+          <p class="notebook-mode-note">Practice uses scripted model replies and real Python tools. The optional live connection is explained inside the final lab.</p>
+          <div class="series-detail-nav"><button id="series-next" class="text-button" type="button"></button></div>
+        </article>
+      </section>
+
+      <section id="notebook-view" class="notebook-view" aria-labelledby="notebook-heading" hidden>
+        <div class="notebook-topline">
+          <button id="notebook-back" class="text-button" type="button">← Back to the bot</button>
+          <button id="notebook-labs" class="text-button" type="button">All labs →</button>
+        </div>
+        <div id="notebook-cell">
+          <p id="notebook-progress" class="notebook-progress">CELL 1 OF 5</p>
+          <h1 id="notebook-heading" tabindex="-1">Start with one Python function.</h1>
+          <p id="notebook-instruction" class="notebook-instruction">Run one small piece of the support bot, then see what it returns.</p>
+          <p id="notebook-challenge" class="notebook-challenge" hidden></p>
+          <div id="notebook-control" class="notebook-control" hidden>
+            <label id="notebook-variant-label" for="notebook-variant">Change one setting</label>
+            <select id="notebook-variant" aria-describedby="notebook-control-note"></select>
+            <p id="notebook-control-note">This changes the code below. Each run starts with a fresh store.</p>
+          </div>
+          <pre class="notebook-code"><code id="notebook-code"># Loading the first cell…</code></pre>
+          <div class="notebook-run-row">
+            <button id="notebook-run" class="primary-button" type="button" disabled>Run cell →</button>
+            <span id="notebook-status" role="status" aria-live="polite"></span>
+          </div>
+          <section id="notebook-output-panel" class="notebook-output-panel" aria-labelledby="notebook-output-heading" hidden>
+            <h2 id="notebook-output-heading">Output</h2>
+            <pre id="notebook-output"></pre>
+          </section>
+          <p id="notebook-takeaway" class="notebook-takeaway" hidden></p>
+          <details id="notebook-manual-choice" class="notebook-manual-choice" hidden>
+            <summary>When would I write the loop myself?</summary>
+            <p>Use Tool Runner when you want the usual request → tool → result → next request cycle handled for you. It also exposes controls for inspecting results and changing the conversation. Write a manual loop when your application's needs do not fit those controls—for example, a particular approval or dispatch workflow.</p>
+            <p>Both approaches still need your business rules, reliable tools, and checks that actions actually happened. Compare the <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-runner" target="_blank" rel="noopener noreferrer">Tool Runner guide</a> and <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls" target="_blank" rel="noopener noreferrer">manual tool handling</a>.</p>
+          </details>
+          <div id="notebook-compare-prompt" class="notebook-compare-prompt" hidden>
+            <p id="notebook-compare-note"></p>
+            <button id="notebook-try-other" class="primary-button" type="button">Change the setting →</button>
+          </div>
+          <nav class="notebook-actions" aria-label="Notebook cells">
+            <button id="notebook-previous" class="text-button" type="button" hidden>← Previous</button>
+            <button id="notebook-next" class="primary-button" type="button" hidden>Next cell →</button>
+          </nav>
+        </div>
+        <section id="notebook-finish" class="notebook-finish" hidden>
+          <h2 id="notebook-finish-heading">You’ve run the whole loop.</h2>
+          <p id="notebook-finish-copy">You have the context. Now choose a small Colab lab and build the code that powers the bot.</p>
+          <div class="notebook-finish-actions">
+            <button id="notebook-deeper" class="primary-button" type="button">Choose a lab →</button>
+            <button id="notebook-repeat" class="text-button" type="button">Review the introductory cells</button>
+          </div>
+          <details id="notebook-further" hidden>
+            <summary>Keep experimenting</summary>
+            <p>Try it yourself in Colab: change the turn limit to 1, predict what will be saved, then check the database. Download the notebook above to edit the Python, or continue with the practice exercises.</p>
+            <button id="notebook-intro" class="text-button" type="button">Review the introductory cells →</button>
+            <button id="notebook-practice" class="text-button" type="button">Open practice exercises →</button>
+            <button id="notebook-playground" class="text-button" type="button">Open full playground →</button>
+          </details>
+        </section>
+        <p id="notebook-mode-note" class="notebook-mode-note">Scripted model replies. Real Python and Tool Runner.</p>
+      </section>
+
+      <section id="course-intro" class="intro" aria-labelledby="page-title" hidden>
+        <div class="intro-copy"><div class="eyebrow">HANDS-ON LAB <span>CLAUDE TOOL RUNNER</span></div><h1 id="page-title">Understand the loop.<br><span>Build the tools.</span></h1><p>Build a support workflow, break it on purpose, and prove it works.<br class="desktop-break"> Seven guided steps. Real Python. No API key needed to start.</p></div>
+        <a class="lesson-card" href="https://academy.claude.com/courses/claude-platform-101/what-is-tool-use" target="_blank" rel="noopener noreferrer"><span class="lesson-kicker">COURSE COMPANION <span aria-hidden="true">↗</span></span><strong>From lesson to experiment</strong><span>Explore tool use from Claude Academy<br>in a working support workflow.</span><span class="lesson-link">Read the lesson <span aria-hidden="true">→</span></span></a>
+      </section>
+
+      <div id="course-navigation" class="workspace-bar" hidden><nav class="view-tabs" role="tablist" aria-label="Lab views"><button id="guided-tab" role="tab" class="view-tab active" aria-selected="true" aria-controls="guided-view">Guided lab</button><button id="explore-tab" role="tab" class="view-tab" aria-selected="false" aria-controls="explore-view">Playground</button><button id="how-tab" role="tab" class="view-tab" aria-selected="false" aria-controls="how-view">How it works</button></nav><span class="bar-note"><span class="tiny-dot"></span>Scripted model. Real SDK and tools.</span></div>
+
+      <section id="guided-view" class="guided-view" aria-labelledby="guided-heading" hidden>
+        <aside class="guide-sidebar" aria-label="Learning steps">
+          <div class="guide-progress"><span class="field-label">YOUR LEARNING PATH</span><strong id="progress-label">0 of 7 steps checked</strong><div class="progress-track"><div id="progress-fill"></div></div></div>
+          <nav id="step-list" class="step-list" aria-label="Course steps"><p class="empty-copy">Loading the learning path…</p></nav>
+          <p id="progress-note" class="progress-note">Checkpoints validate your actual runs and code.</p>
+          <button id="report-button" class="report-button" type="button">↓ Export learning report</button>
+
+        </aside>
+        <article class="lesson-panel" aria-labelledby="guided-heading">
+          <div class="lesson-topline"><span id="step-kicker" class="eyebrow">STEP 1 OF 7</span><span id="step-state" class="step-state">Ready to explore</span></div>
+          <h2 id="guided-heading">See who does the work</h2><p id="step-objective" class="step-objective">Loading the first lesson…</p>
+          <div class="why-card"><h3>Why this matters</h3><p id="step-why"></p></div>
+          <div id="step-instructions" class="step-instructions"></div>
+          <div id="step-actions" class="step-actions"></div>
+          <p id="step-run-status" class="step-run-status" role="status" aria-live="polite"></p>
+          <div id="exercise-panel" class="exercise-panel" hidden><div class="exercise-header"><span class="eyebrow">YOUR CODE</span><button id="copy-path-button" type="button" class="text-button">Copy file path</button></div><code id="exercise-file" class="exercise-file"></code><a id="exercise-source-link" class="code-link" target="_blank" rel="noopener noreferrer" hidden>Open this file in Codespaces ↗</a><p id="exercise-instructions"></p><div class="editor-instruction"><strong>Edit this file in your Codespaces editor.</strong><p>Save your changes, then come back here to check them. The browser shows the file contents; the editor is where you write your code.</p></div><details class="exercise-code"><summary>Read the current starter file</summary><pre id="exercise-starter"></pre></details><div class="exercise-button-row"><button id="exercise-check-button" type="button" class="secondary-button">Check my code</button><button id="reveal-solution-button" type="button" class="text-button">Reveal a reference solution</button></div><div id="exercise-feedback" role="status"></div><details id="solution-panel" class="exercise-code" hidden><summary>Reference solution</summary><pre id="exercise-solution"></pre></details></div>
+          <fieldset id="step-quiz" class="step-quiz" hidden><legend id="quiz-question"></legend><div id="quiz-options"></div></fieldset>
+          <div class="checkpoint-area"><div><h3>Check your understanding</h3><p id="checkpoint-hint">Complete the activity, then verify your progress.</p></div><button id="checkpoint-button" type="button" class="primary-button">Check this step <span aria-hidden="true">→</span></button></div>
+          <div id="checkpoint-results" class="checkpoint-results" role="status" aria-live="polite"></div>
+          <div class="lesson-navigation"><button id="previous-step" class="text-button" type="button">← Previous step</button><button id="next-step" class="text-button" type="button">Next step →</button></div>
+        </article>
+      </section>
+
+      <details id="live-extension" class="live-extension" hidden><summary><span>Try with real Claude</span><span class="optional-pill">OPTIONAL EXTENSION</span></summary><div class="live-extension-body"><div><h3>Same tools. Real model decisions.</h3><p>You can finish every lesson without a key. This optional extension lets you write your own customer request and see how Claude handles it.</p><p class="key-note">Your API key stays in this server session’s memory. It is sent to Anthropic for validation and live calls, never saved in your browser. Key validation uses no model tokens; live runs incur API usage.</p></div><div><form id="connect-form"><label for="api-key">Anthropic API key</label><input id="api-key" type="password" placeholder="sk-ant-…" autocomplete="off" spellcheck="false"><button id="connect-button" type="submit" class="secondary-button">Connect & validate</button></form><div id="connected-settings" hidden><label for="connected-model">Model for live runs</label><select id="connected-model"></select><div class="live-buttons"><button id="start-live-button" type="button" class="primary-button">Open live playground →</button><button id="disconnect-button" type="button" class="text-button">Disconnect session key</button></div></div><p id="connection-status" role="status" class="connection-status"></p></div></div></details>
+
+      <section id="explore-view" aria-label="Interactive support agent experiment" hidden><div id="guided-workspace-banner" class="guided-workspace-banner" hidden><div><strong id="workspace-lesson-title">Your experiment</strong><span>Run it, inspect the evidence, then check the lesson.</span></div><button id="back-to-lesson" type="button" class="secondary-button">Back to lesson ↑</button></div>
+        <div class="workbench">
+          <aside class="control-column" aria-label="Experiment controls">
+            <div class="panel-heading"><span class="step-number">01</span><h2>Set the scene</h2></div>
+            <div class="control-section"><span class="field-label">How this lab runs</span><select id="run-mode" hidden aria-label="Practice mode"><option value="fixture">Practice mode</option><option value="live" disabled>Live Claude</option></select><div id="practice-chip" class="practice-chip"><span aria-hidden="true">●</span> No API key needed</div><p id="mode-description" class="field-help">Scripted model responses.<br>Real SDK and tool execution.</p></div>
+            <div class="control-section"><div class="field-label">Customer scenario</div><div id="scenario-list" class="scenario-list" role="group" aria-label="Choose a customer scenario"><p class="empty-copy">Loading scenarios…</p></div></div>
+            <div class="control-section experiment-controls"><div class="field-label">Change the conditions</div><label class="range-heading" for="stock-count"><span>Replacement stock</span><output id="stock-value" for="stock-count">0</output></label><input id="stock-count" type="range" min="0" max="10" step="1" value="0"><div class="range-labels"><span>Out of stock</span><span>10 available</span></div><label class="switch-row"><span><strong>Inventory outage</strong><small>Make the inventory tool fail</small></span><input id="inventory-outage" type="checkbox"><span class="switch-ui" aria-hidden="true"></span></label><label class="switch-row"><span><strong>Skip the return write</strong><small>A tool says “done” but saves nothing</small></span><input id="missing-write" type="checkbox"><span class="switch-ui" aria-hidden="true"></span></label></div>
+            <div class="challenge-card"><span class="challenge-icon" aria-hidden="true">↳</span><div><strong>Try to catch a false success</strong><p>Skip the return write, run the agent, and see whether verification catches it.</p></div></div>
+            <details class="tools-details"><summary>Inspect available tools <span id="tool-count" class="count">—</span></summary><div id="tool-list"></div></details>
+          </aside>
+
+          <section class="run-column" aria-labelledby="run-heading">
+            <div class="panel-heading"><span class="step-number">02</span><h2 id="run-heading">Run the agent</h2><span id="run-status" class="status-badge">Ready</span></div>
+            <div class="request-card"><div class="card-kicker"><span class="avatar" aria-hidden="true">C</span><span>CUSTOMER REQUEST</span><span id="scenario-label">Practice scenario</span></div><p id="request-text" class="request-text">Loading the customer’s request…</p><label class="sr-only" for="live-prompt">Customer request for live Claude</label><textarea id="live-prompt" rows="4" hidden placeholder="Describe the customer’s support request…"></textarea><div class="request-footer"><span id="request-hint">Choose a scenario to begin.</span><button id="reset-button" class="text-button" type="button" disabled><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 7a6 6 0 1 1-.4 5M4 3v4h4"/></svg>Reset</button></div></div>
+            <div class="run-actions"><button id="run-button" class="primary-button" disabled><svg aria-hidden="true" viewBox="0 0 20 20"><path d="m7 4 9 6-9 6z"/></svg><span>Run experiment</span></button><span id="run-caption">Each run starts with fresh store data.</span></div>
+            <div id="run-error" class="error-banner" role="alert" hidden></div>
+            <section id="answer-card" class="answer-card" aria-labelledby="answer-heading" hidden><div class="answer-heading"><span class="answer-mark" aria-hidden="true">✳</span><h3 id="answer-heading">Agent’s answer</h3><span id="answer-mode">Practice</span></div><p id="answer-text"></p><div id="metrics" class="metrics"></div></section>
+            <div class="trace-header"><h3>Execution trace</h3><span id="event-count">Waiting for a run</span></div>
+            <div id="trace-empty" class="trace-empty"><div class="loop-diagram" aria-hidden="true"><span class="loop-node">Request</span><span class="loop-arrow">→</span><span class="loop-node loop-model">Claude</span><span class="loop-arrow">⇄</span><span class="loop-node">Tools</span></div><h3>See the work behind the answer.</h3><p>The model chooses a tool. Your code executes it.<br>The result goes back to the model, until it’s done.</p><span class="empty-footnote">Start a run to inspect every step.</span></div>
+            <ol id="event-list" class="event-list" aria-label="Agent execution events"></ol>
+
+            <div id="run-summary" class="run-summary" role="status" aria-live="polite"></div><button id="download-button" class="download-button" type="button" hidden>↓ Download run evidence <span>JSON</span></button>
+          </section>
+
+          <aside class="state-column" aria-label="Store state and verification">
+            <div class="panel-heading"><span class="step-number">03</span><h2>Check the outcome</h2></div>
+            <div class="state-panel"><div class="state-heading"><h3>Store state</h3><span id="state-badge">Before run</span></div><p id="state-help" class="state-help">The source of truth behind the conversation.</p><div class="state-tabs" role="tablist" aria-label="Store data"><button id="orders-tab" role="tab" aria-selected="true" aria-controls="state-data" data-state="orders" class="active">Orders <span id="orders-count">0</span></button><button id="inventory-tab" role="tab" aria-selected="false" aria-controls="state-data" data-state="inventory">Stock <span id="inventory-count">0</span></button><button id="returns-tab" role="tab" aria-selected="false" aria-controls="state-data" data-state="returns">Returns <span id="returns-count">0</span></button></div><div id="state-data" class="state-data" role="tabpanel" aria-labelledby="orders-tab"><div class="state-empty">Store data appears when the lab is ready.</div></div><details class="raw-state"><summary>View state as JSON</summary><pre id="state-json">{}</pre></details></div>
+            <section class="verification-panel" aria-labelledby="verification-heading"><div class="state-heading"><h3 id="verification-heading">Verification</h3><span id="check-score" class="check-score">—</span></div><p class="state-help">Check the database, not just the answer.</p><div id="checks-list" class="checks-list"><div class="verification-empty"><span aria-hidden="true">◎</span><p>Did the agent follow policy?<br>Was the return actually created?</p></div></div><button id="checks-button" class="secondary-button" type="button" disabled><svg aria-hidden="true" viewBox="0 0 20 20"><path d="m5 10 3 3 7-7"/><circle cx="10" cy="10" r="8"/></svg><span>Run test suite</span></button><p class="suite-help">Test local tool contracts without a model.</p><details id="suite-results" class="suite-results" hidden><summary id="suite-summary">Test suite results</summary><div id="suite-list"></div></details><p id="suite-status" class="suite-status" role="status"></p><p id="checks-note" class="checks-note">Run an experiment to verify its outcome.</p></section>
+            <div class="learning-note"><span class="eyebrow">THE TAKEAWAY</span><p>A convincing answer isn’t proof.<br><strong>The state tells the story.</strong></p></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="how-view" class="how-view" aria-labelledby="how-heading" hidden><div class="how-intro"><span class="eyebrow">UNDER THE HOOD</span><h2 id="how-heading">The runner handles the loop.<br>Your tools do the work.</h2><p>Claude decides what to call and with which inputs. The application executes that code and returns the result. A final message is useful; an independent check tells you what actually happened.</p></div><div class="concept-grid"><article><span>01 / DECIDE</span><h3>The model chooses</h3><p>Tool descriptions and input schemas tell Claude what is possible. Its response can request a tool instead of answering the customer.</p></article><article><span>02 / EXECUTE</span><h3>Your code acts</h3><p>An order lookup reads the database. A return tool writes a record. Validate inputs and enforce policy here, where the operation happens.</p></article><article><span>03 / VERIFY</span><h3>Check the evidence</h3><p>Compare the final answer to the actual ledger. Tests catch failed writes and broken policy that a plausible answer can conceal.</p></article></div><div class="code-comparison"><article class="code-card"><div><h3>A manual loop</h3><span>Illustrative Python snippet</span></div><pre><code>while True:
+    response = client.messages.create(
+        model=model,
+        messages=messages,
+        tools=tool_schemas,
+        max_tokens=1024,
+    )
+    messages.append({
+        "role": "assistant",
+        "content": response.content,
+    })
+    if response.stop_reason != "tool_use":
+        break
+    results = execute_tool_calls(response)
+    messages.append({
+        "role": "user",
+        "content": results,
+    })</code></pre><p>Your loop collects tool results and sends them back. <code>execute_tool_calls</code> is application code that returns API-format tool result blocks.</p></article><article class="code-card"><div><h3>With the tool runner</h3><span>Illustrative Python snippet</span></div><pre><code>from anthropic import beta_tool
+
+@beta_tool
+def lookup_order(order_id: str) -&gt; str:
+    """Look up an order by its ID."""
+    return read_order_as_json(order_id)
+
+runner = client.beta.messages.tool_runner(
+    model=model,
+    max_tokens=1024,
+    messages=messages,
+    tools=[lookup_order],
+)
+
+for message in runner:
+    inspect(message)</code></pre><p>The SDK replaces the repeated glue code: tool dispatch, result formatting, conversation updates, and the next API call. <code>read_order_as_json</code> and <code>inspect</code> are application helpers. Your tool code still owns correctness.</p></article></div><div class="mode-explanation"><h3>What really runs?</h3><div><strong>Scripted model responses</strong><p>Repeatable messages stand in for model replies. No model API call or API key is needed. You can compare the same case under different conditions.</p></div><div><strong>Real SDK, tools, and database</strong><p>The Anthropic SDK Tool Runner executes actual Python functions against SQLite. Faults and verification are real; the lab does not animate a pretend outcome.</p></div></div><div class="resource-row"><a href="https://academy.claude.com/courses/claude-platform-101/what-is-tool-use" target="_blank" rel="noopener noreferrer">Claude Academy: tool use <span aria-hidden="true">↗</span></a><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use" target="_blank" rel="noopener noreferrer">Claude tool-use documentation <span aria-hidden="true">↗</span></a></div></section>
+    </main>
+    <footer><span>Built to be opened, changed, and understood.</span><span>Independent learning companion · Not affiliated with Anthropic</span></footer>
+  </div>
+</body>
+</html>
